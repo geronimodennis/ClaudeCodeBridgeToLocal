@@ -91,6 +91,9 @@ claudebl setup --provider ollama --location local --url http://127.0.0.1:11434 -
 
 ## Everyday commands
 
+Print the installed CLI version with `claudebl version` or `claudebl --version`.
+From the Windows source folder, use `.\run.cmd version`.
+
 Use `claudebl open` to launch Claude Desktop. From this source folder on Windows,
 run `.\run.cmd open`. The command discovers Windows Store installations, uses
 `open -a Claude` on macOS, and `claude-desktop` on Linux. For a custom executable:

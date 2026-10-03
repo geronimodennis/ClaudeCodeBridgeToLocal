@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3
+
+- Add `claudebl version` alongside `claudebl --version`.
+
 ## 1.0.2
 
 - Add `claudebl open` to launch Claude Desktop on Windows, macOS, and Linux.

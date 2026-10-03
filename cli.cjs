@@ -108,8 +108,8 @@ async function setup(options){
 async function main(){
   if(Number(process.versions.node.split('.')[0])<20)throw new Error('Node.js 20 or newer is required.');
   const {command,options}=args(process.argv.slice(2));
-  if(options.version){console.log('ClaudeCodeBridgeToLocal '+require('./package.json').version);return;}
-  if(options.help || command==='help'){console.log('Commands: setup, start, open, stop, status, doctor, restore\nOpen: claudebl open [--app PATH]\nSetup flags: --provider ollama --location local|lan --url URL --model MODEL --port PORT --yes --test\nExample: claudebl setup --provider ollama --location lan --url http://ollama-server.local:11434 --model "YOUR-MODEL" --yes');return;}
+  if(options.version || command==='version'){console.log('ClaudeCodeBridgeToLocal '+require('./package.json').version);return;}
+  if(options.help || command==='help'){console.log('Commands: setup, start, open, stop, status, doctor, restore, version\nOpen: claudebl open [--app PATH]\nSetup flags: --provider ollama --location local|lan --url URL --model MODEL --port PORT --yes --test\nExample: claudebl setup --provider ollama --location lan --url http://ollama-server.local:11434 --model "YOUR-MODEL" --yes');return;}
   switch(command){
     case 'setup':await setup(options);break;
     case 'start':await start();break;
