@@ -40,3 +40,9 @@ The npm tarball excludes user settings, credentials, logs, and backups. Installi
 the package does not alter Desktop; the user must invoke `claudebl setup`.
 The default release license is `UNLICENSED`; the project owner can select an
 open-source license separately.
+
+## npm publication
+
+Published and verified: `claudecodebridgetolocal@1.0.0`, executable `claudebl`.
+The registry tarball SHA-1 is `20c7c53e598799219ef891f0e2ff3316473e59c7`, matching
+the release package built and tested locally. The local install smoke test passed.

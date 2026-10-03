@@ -4,23 +4,25 @@ A terminal setup wizard for Claude **Desktop**, with Windows, macOS, and Linux l
 
 Project name: **ClaudeCodeBridgeToLocal**. npm package: **`claudecodebridgetolocal`**. CLI command: **`claudebl`**. Despite the project name, this package configures the Claude Desktop GUI; it does not launch the Claude Code terminal CLI.
 
+Version **1.0.0** is published on [npm](https://www.npmjs.com/package/claudecodebridgetolocal). Source and release assets are hosted at [geronimodennis/ClaudeCodeBridgeToLocal](https://github.com/geronimodennis/ClaudeCodeBridgeToLocal).
+
 ## Install the npm package
 
-Install the release tarball before it is published to npm:
+To install a downloaded release tarball:
 
 ```sh
 npm install -g ./claudecodebridgetolocal-1.0.0.tgz
 claudebl setup
 ```
 
-After the package has been published to the public registry:
+To install from the public npm registry:
 
 ```sh
 npm install -g claudecodebridgetolocal
 claudebl setup
 ```
 
-Alternatively, after publication, run the wizard without a global install:
+Alternatively, run the wizard without a global install:
 
 ```sh
 npx --package claudecodebridgetolocal claudebl setup
