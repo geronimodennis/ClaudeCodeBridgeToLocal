@@ -17,9 +17,11 @@ function createProxy(settings, log=()=>{}) {
   }
   const server=http.createServer(async(req,res)=>{
     const route=new URL(req.url,'http://localhost').pathname;
-    if(req.method==='GET' && route==='/health') return json(res,200,{service:'claude-desktop-ollama-proxy',instance:settings.instance,model:settings.model,upstream:settings.url});
+    if(req.method==='GET' && route==='/health' && !settings.remote) return json(res,200,{service:'claude-desktop-ollama-proxy',instance:settings.instance,model:settings.model,upstream:settings.url});
     const authorized=req.headers.authorization===`Bearer ${settings.token}` || req.headers['x-api-key']===settings.token;
     if(!authorized) return json(res,401,{type:'error',error:{type:'authentication_error',message:'Proxy credential required.'}});
+    if(req.method==='GET' && route==='/health') return json(res,200,{service:'claude-desktop-ollama-proxy',instance:settings.instance,model:settings.model,upstream:settings.url});
+    if(settings.remote && route==='/__shutdown') return json(res,404,{type:'error',error:{type:'not_found_error',message:'Manage this bridge on the server.'}});
     if(req.method==='POST' && route==='/__shutdown'){json(res,200,{stopped:true});server.close();server.closeAllConnections();return;}
     if(req.method==='GET' && (route==='/v1/models' || route==='/v1/models/'+ALIAS)) {
       const model={id:ALIAS,type:'model',display_name:`Ollama: ${settings.model} (proxy)`,created_at:'2026-10-04T00:00:00Z'};

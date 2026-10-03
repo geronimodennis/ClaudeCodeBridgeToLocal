@@ -5,6 +5,7 @@ node_modules/
 .npmrc
 settings.json
 state.json
+remote-server.json
 backups/
 .DS_Store
 Thumbs.db

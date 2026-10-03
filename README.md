@@ -91,6 +91,21 @@ claudebl setup --provider ollama --location local --url http://127.0.0.1:11434 -
 
 ## Everyday commands
 
+For a bridge hosted on the Ollama server instead of this computer, see
+[remote bridge setup](REMOTE-SETUP.md). Source version 1.1.0 adds `server-init`,
+`serve`, and `connect`; these require an HTTPS bridge endpoint on your server.
+
+From the source folder, you can also use `npm run claudebl -- COMMAND`.
+In Windows PowerShell use `npm.cmd` to avoid script execution-policy restrictions:
+
+```powershell
+npm.cmd run claudebl -- setup
+npm.cmd run claudebl -- open
+npm.cmd run claudebl -- version
+```
+
+Running `npm.cmd run claudebl` without a command starts the setup wizard.
+
 Print the installed CLI version with `claudebl version` or `claudebl --version`.
 From the Windows source folder, use `.\run.cmd version`.
 

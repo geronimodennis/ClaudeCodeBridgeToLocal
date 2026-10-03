@@ -50,7 +50,7 @@ function applyConfiguration(p, settings) {
   const backup=path.join(p.install,'backups',id);
   fs.mkdirSync(backup,{recursive:true,mode:0o700});
   if(before) fs.writeFileSync(path.join(backup,'_meta.json'),before,{mode:0o600});
-  const entry={inferenceProvider:'gateway',inferenceCredentialKind:'static',inferenceGatewayBaseUrl:`http://127.0.0.1:${settings.port}`,inferenceGatewayApiKey:settings.token,inferenceGatewayAuthScheme:'bearer',inferenceModels:[{name:ALIAS,labelOverride:`Ollama: ${settings.model} (proxy)`,anthropicFamilyTier:'sonnet'}]};
+  const entry={inferenceProvider:'gateway',inferenceCredentialKind:'static',inferenceGatewayBaseUrl:settings.gatewayUrl || `http://127.0.0.1:${settings.port}`,inferenceGatewayApiKey:settings.token,inferenceGatewayAuthScheme:'bearer',inferenceModels:[{name:ALIAS,labelOverride:`Ollama: ${settings.model} (proxy)`,anthropicFamilyTier:'sonnet'}]};
   const after=JSON.stringify({...meta,appliedId:id,entries:[...meta.entries,{id,name:'Ollama proxy wizard'}]},null,2)+'\n';
   const state={active:true,id,library:p.library,backup,metaExisted:!!before,afterHash:hash(after)};
   // Save recovery information before changing either Desktop file.

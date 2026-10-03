@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+
+- Add `server-init` and `serve` for hosting the bridge alongside remote Ollama.
+- Add `connect --url HTTPS-URL` to point Desktop directly to the remote bridge.
+- Require authenticated remote health checks and disable network shutdown.
+
 ## 1.0.3
 
 - Add `claudebl version` alongside `claudebl --version`.

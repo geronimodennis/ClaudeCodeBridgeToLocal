@@ -8,14 +8,16 @@ const {spawn}=require('node:child_process');
 const core=require('./core.cjs');
 const ui=require('./ui.cjs');
 const {openDesktop}=require('./desktop.cjs');
+const remote=require('./remote.cjs');
 const p=core.paths();
 const settingsFile=path.join(p.install,'settings.json');
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function request(url,options={},timeout=10000){const response=await fetch(url,{...options,signal:AbortSignal.timeout(timeout)});if(!response.ok)throw new Error(`HTTP ${response.status}: ${(await response.text()).slice(0,200)}`);return response.json();}
 function settings(){if(!fs.existsSync(settingsFile))throw new Error('Run setup first.');return core.readJson(settingsFile);}
-async function health(s){return request(`http://127.0.0.1:${s.port}/health`,{},2000);}
+async function health(s){return request((s.gatewayUrl || `http://127.0.0.1:${s.port}`)+'/health',{headers:{authorization:`Bearer ${s.token}`}},5000);}
 async function start(){
   const s=settings();
+  if(s.mode==='remote'){await health(s);console.log('Remote bridge is reachable; manage its process on the server.');return;}
   try {const h=await health(s);if(h.instance!==s.instance || h.service!=='claude-desktop-ollama-proxy')throw new Error('Another service is using the proxy port.');console.log('Proxy is already running.');return;}
   catch(error){if(error.message==='Another service is using the proxy port.')throw error;}
   await availablePort(s.port);
@@ -26,7 +28,7 @@ async function start(){
 }
 async function stop(){
   if(!fs.existsSync(settingsFile)){console.log('No wizard installation found.');return;}
-  const s=settings();let h;
+  const s=settings();if(s.mode==='remote'){console.log('Remote bridge remains running; manage it on the server.');return;}let h;
   try{h=await health(s);}catch{console.log('Proxy is not responding; no process was killed.');return;}
   if(h.instance!==s.instance || h.service!=='claude-desktop-ollama-proxy')throw new Error('Another service is on this port; it will not be stopped.');
   await request(`http://127.0.0.1:${s.port}/__shutdown`,{method:'POST',headers:{authorization:`Bearer ${s.token}`}},3000);
@@ -35,18 +37,20 @@ async function stop(){
 async function availablePort(port){await new Promise((resolve,reject)=>{const server=net.createServer();server.on('error',()=>reject(new Error(`Port ${port} is occupied. Stop the existing proxy or choose --port 11436.`)));server.listen(port,'127.0.0.1',()=>server.close(resolve));});}
 async function doctor(){
   const s=settings();
+  if(s.mode!=='remote'){
   const tags=await request(s.url+'/api/tags');
   if(!tags.models?.some(model=>model.name===s.model || model.model===s.model))throw new Error('Selected model is missing from Ollama.');
   console.log('Ollama is reachable; selected model exists.');
+  }
   const h=await health(s);if(h.instance!==s.instance)throw new Error('Proxy instance does not match.');
-  const response=await request(`http://127.0.0.1:${s.port}/v1/messages`,{method:'POST',headers:{'content-type':'application/json',authorization:`Bearer ${s.token}`},body:JSON.stringify({model:core.ALIAS,max_tokens:32,thinking:{type:'disabled'},messages:[{role:'user',content:'Reply with OK.'}]})},30000);
+  const response=await request((s.gatewayUrl || `http://127.0.0.1:${s.port}`)+'/v1/messages',{method:'POST',headers:{'content-type':'application/json',authorization:`Bearer ${s.token}`},body:JSON.stringify({model:core.ALIAS,max_tokens:32,thinking:{type:'disabled'},messages:[{role:'user',content:'Reply with OK.'}]})},30000);
   if(!Array.isArray(response.content))throw new Error('Provider returned an unexpected Messages response.');
   console.log('Messages API test passed: '+response.content.filter(block=>block.type==='text').map(block=>block.text).join(''));
   console.log('This verifies the bridge, not full Claude Desktop feature compatibility.');
 }
 function args(argv){
   const options={};let command=argv[0] && !argv[0].startsWith('--') ? argv.shift() : 'setup';
-  const known=new Set(['provider','location','url','model','port','app']);
+  const known=new Set(['provider','location','url','model','port','app','config']);
   while(argv.length){const arg=argv.shift();if(['--yes','--test','--help','--version'].includes(arg)){options[arg.slice(2)]=true;continue;}if(!arg.startsWith('--') || !known.has(arg.slice(2)) || !argv.length)throw new Error('Unknown or incomplete option: '+arg);options[arg.slice(2)]=argv.shift();}
   return {command,options};
 }
@@ -109,8 +113,11 @@ async function main(){
   if(Number(process.versions.node.split('.')[0])<20)throw new Error('Node.js 20 or newer is required.');
   const {command,options}=args(process.argv.slice(2));
   if(options.version || command==='version'){console.log('ClaudeCodeBridgeToLocal '+require('./package.json').version);return;}
-  if(options.help || command==='help'){console.log('Commands: setup, start, open, stop, status, doctor, restore, version\nOpen: claudebl open [--app PATH]\nSetup flags: --provider ollama --location local|lan --url URL --model MODEL --port PORT --yes --test\nExample: claudebl setup --provider ollama --location lan --url http://ollama-server.local:11434 --model "YOUR-MODEL" --yes');return;}
+  if(options.help || command==='help'){console.log('Commands: setup, start, open, stop, status, doctor, restore, version, server-init, serve, connect\nRemote: server-init --url OLLAMA-URL --model MODEL; serve --config FILE; connect --url HTTPS-BRIDGE\nOpen: claudebl open [--app PATH]\nSetup flags: --provider ollama --location local|lan --url URL --model MODEL --port PORT --yes --test\nExample: claudebl setup --provider ollama --location lan --url http://ollama-server.local:11434 --model "YOUR-MODEL" --yes');return;}
   switch(command){
+    case 'server-init':await remote.serverInit(options);break;
+    case 'serve':remote.serve(options);break;
+    case 'connect':await remote.connect(options);break;
     case 'setup':await setup(options);break;
     case 'start':await start();break;
     case 'open':await openDesktop({app:options.app});break;

@@ -9,9 +9,23 @@ const {promisify}=require('node:util');
 const core=require('./core.cjs');
 const {createProxy}=require('./server.cjs');
 const {args}=require('./cli.cjs');
+const {remoteUrl}=require('./remote.cjs');
 const exec=promisify(execFile);
 const listen=server=>new Promise(resolve=>server.listen(0,'127.0.0.1',()=>resolve(server.address().port)));
 const close=server=>new Promise(resolve=>{server.close(resolve);server.closeAllConnections();});
+test('remote bridge enforces HTTPS, protects health, and refuses network shutdown',async()=>{
+  assert.equal(remoteUrl('https://bridge.example.com/'),'https://bridge.example.com');
+  for(const url of ['http://bridge.example.com','https://user:secret@bridge.example.com','https://bridge.example.com/path'])assert.throws(()=>remoteUrl(url));
+  const proxy=createProxy({remote:true,url:'http://127.0.0.1:1',model:'mock',instance:'remote-test',token:'test-token'});
+  const port=await listen(proxy);const base=`http://127.0.0.1:${port}`;
+  try{
+    assert.equal((await fetch(base+'/health')).status,401);
+    const headers={authorization:'Bearer test-token'};
+    assert.equal((await fetch(base+'/health',{headers})).status,200);
+    assert.equal((await fetch(base+'/__shutdown',{method:'POST',headers})).status,404);
+    assert.equal((await fetch(base+'/health',{headers})).status,200);
+  }finally{await close(proxy);}
+});
 test('platform paths and Ollama root URL validation',()=>{
   assert.equal(core.paths('win32','home',{LOCALAPPDATA:'local'}).library,path.join('local','Claude-3p','configLibrary'));
   assert.equal(core.paths('darwin','home',{}).library,path.join('home','Library','Application Support','Claude-3p','configLibrary'));

@@ -1,6 +1,6 @@
 {
   "name": "claudecodebridgetolocal",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "ClaudeCodeBridgeToLocal: a cross-platform Claude Desktop to local or LAN Ollama bridge",
   "bin": {
     "claudebl": "cli.cjs"
@@ -9,6 +9,7 @@
     "node": ">=20"
   },
   "scripts": {
+    "claudebl": "node cli.cjs",
     "setup": "node cli.cjs setup",
     "test": "node --test test.cjs"
   },
@@ -25,7 +26,9 @@
     "LICENSE",
     "CHANGELOG.md",
     "ui.cjs",
-    "desktop.cjs"
+    "desktop.cjs",
+    "remote.cjs",
+    "REMOTE-SETUP.md"
   ],
   "keywords": [
     "claude",
