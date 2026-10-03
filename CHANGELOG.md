@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1
+
+- Present setup as five numbered steps with a branded header, clearer location choices, and a review summary.
+- Add terminal color with plain-text output when redirected or when NO_COLOR is set.
+- Replace personal server and model examples with generic placeholders.
+
 ## 1.0.0
 
 - Introduce ClaudeCodeBridgeToLocal and the `claudebl` command.

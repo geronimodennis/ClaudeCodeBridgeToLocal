@@ -1,12 +1,42 @@
 {
   "name": "claudecodebridgetolocal",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "ClaudeCodeBridgeToLocal: a cross-platform Claude Desktop to local or LAN Ollama bridge",
-  "bin": { "claudebl": "cli.cjs" },
-  "engines": { "node": ">=20" },
-  "scripts": { "setup": "node cli.cjs setup", "test": "node --test test.cjs" },
-  "files": ["cli.cjs", "core.cjs", "server.cjs", "run.cmd", "run.sh", "Setup-Windows.cmd", "Setup-macOS.command", "setup-linux.sh", "README.md", "LICENSE", "CHANGELOG.md"],
-  "keywords": ["claude", "claude-desktop", "ollama", "local-llm", "cli", "proxy"],
-  "publishConfig": { "access": "public", "registry": "https://registry.npmjs.org/" },
+  "bin": {
+    "claudebl": "cli.cjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "setup": "node cli.cjs setup",
+    "test": "node --test test.cjs"
+  },
+  "files": [
+    "cli.cjs",
+    "core.cjs",
+    "server.cjs",
+    "run.cmd",
+    "run.sh",
+    "Setup-Windows.cmd",
+    "Setup-macOS.command",
+    "setup-linux.sh",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "ui.cjs"
+  ],
+  "keywords": [
+    "claude",
+    "claude-desktop",
+    "ollama",
+    "local-llm",
+    "cli",
+    "proxy"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "license": "UNLICENSED"
 }

@@ -17,7 +17,7 @@ test('platform paths and Ollama root URL validation',()=>{
   assert.equal(core.paths('darwin','home',{}).library,path.join('home','Library','Application Support','Claude-3p','configLibrary'));
   assert.equal(core.paths('linux','home',{}).library,path.join('home','.config','Claude-3p','configLibrary'));
   assert.equal(core.paths('linux','home',{XDG_CONFIG_HOME:'xdg'}).library,path.join('xdg','Claude-3p','configLibrary'));
-  assert.equal(core.normalizeUrl('zf13-dg:11434/v1/'),'http://zf13-dg:11434');
+  assert.equal(core.normalizeUrl('ollama-server.local:11434/v1/'),'http://ollama-server.local:11434');
   for(const url of ['ftp://server','http://user:password@server','http://server?token=secret','http://server/api'])assert.throws(()=>core.normalizeUrl(url));
   assert.equal(args(['setup','--location','lan','--yes']).options.location,'lan');
   assert.throws(()=>args(['setup','--typo']));

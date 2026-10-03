@@ -6,6 +6,7 @@ const net=require('node:net');
 const readline=require('node:readline/promises');
 const {spawn}=require('node:child_process');
 const core=require('./core.cjs');
+const ui=require('./ui.cjs');
 const p=core.paths();
 const settingsFile=path.join(p.install,'settings.json');
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
@@ -59,28 +60,37 @@ async function setup(options){
     return (await rl.question(question+(defaultValue?` [${defaultValue}]`:'')+': ')).trim() || defaultValue;
   };
   try {
-    console.log('Claude Desktop → local proxy → Ollama\nExperimental bridge: the actual model remains Ollama, not Claude.');
-    const provider=options.provider || await ask('Model provider (currently supported: ollama)','ollama');
+    ui.heading();
+    ui.hint('Experimental compatibility bridge · automatic startup is off');
+    ui.step(1,'Choose a provider');
+    const provider=options.provider || await ask('  Provider','ollama');
     if(provider.toLowerCase()!=='ollama')throw new Error('Version 1 supports Ollama only.');
-    let location=options.location || await ask('Where is Ollama? 1 = this computer, 2 = remote LAN','1');
+    ui.step(2,'Where is your model server?');
+    console.log('  1  This computer     Ollama runs on this device');
+    console.log('  2  Local network     Ollama runs on another device');
+    let location=options.location || await ask('  Select location','1');
     location=({'1':'local','2':'lan'}[location] || location).toLowerCase();
     if(!['local','lan'].includes(location))throw new Error('Location must be local or lan.');
-    const input=options.url || (location==='local'?'http://127.0.0.1:11434':await ask('Ollama LAN server URL (example http://zf13-dg:11434)'));
+    const input=options.url || (location==='local'?'http://127.0.0.1:11434':await ask('Ollama LAN server URL (example http://ollama-server.local:11434)'));
     const url=core.normalizeUrl(input);
     if(location==='local' && !['127.0.0.1','localhost','[::1]'].includes(new URL(url).hostname))throw new Error('Choose LAN for a remote server address.');
-    console.log('Checking '+url+' ...');
+    ui.step(3,'Select a model');
+    ui.hint('Connecting to '+ui.clean(url)+' ...');
     const tags=await request(url+'/api/tags');
     const models=tags.models || [];
     if(!models.length)throw new Error('No models found. Pull a model in Ollama, then rerun setup.');
-    models.forEach((model,i)=>console.log(`${i+1}. ${model.name}${model.remote_host?' (Ollama cloud-backed)':''}${model.capabilities && !model.capabilities.includes('tools')?' (no tool capability reported)':''}`));
-    const choice=options.model || await ask('Choose a model number or exact model name','1');
+    models.forEach((model,i)=>console.log(`${String(i+1).padStart(3)}  ${ui.clean(model.name)}${model.remote_host?' (Ollama cloud-backed)':''}${model.capabilities && !model.capabilities.includes('tools')?' (no tool capability reported)':''}`));
+    const choice=options.model || await ask('  Model number or name','1');
     const selected=/^\d+$/.test(choice) ? models[Number(choice)-1] : models.find(model=>model.name===choice || model.model===choice);
     if(!selected)throw new Error('Selected model is not in this Ollama server.');
     if(selected.capabilities && !selected.capabilities.includes('tools'))console.log('This model may not handle Code/Cowork tool calls.');
+    ui.step(4,'Local connection');
+    ui.hint('The proxy listens only on this computer. Press Enter for the default.');
     const port=Number(options.port || await ask('Local proxy port','11435'));
     if(!Number.isInteger(port) || port<1024 || port>65535)throw new Error('Port must be an integer from 1024 to 65535.');
     await availablePort(port);
-    console.log(`\nProvider: ${url}\nActual model: ${selected.name}\nDesktop proxy: http://127.0.0.1:${port}\nDesktop library: ${p.library}\nAutostart: off\nBackups: ${path.join(p.install,'backups')}`);
+    ui.step(5,'Review and connect');
+    ui.summary([['Provider',url],['Model',selected.name],['Proxy','http://127.0.0.1:'+port],['Automatic startup','Off'],['Desktop library',p.library],['Backups',path.join(p.install,'backups')]]);
     if(!options.yes && !/^y(es)?$/i.test(await ask('Save this configuration and start the proxy? y/n','n'))){console.log('Cancelled. No configuration changed.');return;}
     fs.mkdirSync(p.install,{recursive:true,mode:0o700});
     for(const name of ['server.cjs','core.cjs'])fs.copyFileSync(path.join(__dirname,name),path.join(p.install,name));
@@ -98,7 +108,7 @@ async function main(){
   if(Number(process.versions.node.split('.')[0])<20)throw new Error('Node.js 20 or newer is required.');
   const {command,options}=args(process.argv.slice(2));
   if(options.version){console.log('ClaudeCodeBridgeToLocal '+require('./package.json').version);return;}
-  if(options.help || command==='help'){console.log('Commands: setup, start, stop, status, doctor, restore\nSetup flags: --provider ollama --location local|lan --url URL --model MODEL --port PORT --yes --test\nExample: claudebl setup --provider ollama --location lan --url http://zf13-dg:11434 --model "qwn3.8-27B-MemMap-config:latest" --yes');return;}
+  if(options.help || command==='help'){console.log('Commands: setup, start, stop, status, doctor, restore\nSetup flags: --provider ollama --location local|lan --url URL --model MODEL --port PORT --yes --test\nExample: claudebl setup --provider ollama --location lan --url http://ollama-server.local:11434 --model "YOUR-MODEL" --yes');return;}
   switch(command){
     case 'setup':await setup(options);break;
     case 'start':await start();break;

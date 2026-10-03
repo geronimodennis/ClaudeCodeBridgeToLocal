@@ -65,7 +65,7 @@ The wizard asks:
 
 1. **Provider:** Ollama. Version 1 supports Ollama only, not arbitrary OpenAI-compatible providers.
 2. **Location:** this computer or remote LAN.
-3. **Address:** local defaults to `http://127.0.0.1:11434`; LAN asks for a URL such as `http://zf13-dg:11434`. The wizard accepts a `/v1` suffix and normalizes it to the Ollama server root.
+3. **Address:** local defaults to `http://127.0.0.1:11434`; LAN asks for a URL such as `http://ollama-server.local:11434`. The wizard accepts a `/v1` suffix and normalizes it to the Ollama server root.
 4. **Model:** it checks `/api/tags` and lists the server's available models. Enter a number or exact model name. Choose a tool-capable model for Code or Cowork. Cloud-backed Ollama models are identified when the server reports them.
 5. **Proxy port:** defaults to `11435`; choose another if occupied.
 6. **Review and apply:** the wizard shows the addresses and paths, asks before saving, backs up the previous Desktop selection, and starts the proxy.
@@ -75,10 +75,10 @@ Fully quit Claude Desktop and reopen it after setup. If it offers a configured t
 
 ## One-command setup
 
-For the LAN server used in this chat:
+For a LAN server (replace the address and model with your own):
 
 ```sh
-claudebl setup --provider ollama --location lan --url http://zf13-dg:11434 --model "qwn3.8-27B-MemMap-config:latest" --yes
+claudebl setup --provider ollama --location lan --url http://ollama-server.local:11434 --model "YOUR-MODEL" --yes
 ```
 
 For a local server, replace the URL and model with your own:
