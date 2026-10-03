@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.1
+
+- Choose bridge placement from setup location: local runs a local bridge, LAN connects to a remote HTTPS bridge.
+- Prompt for the remote bridge credential without displaying it.
+- Never silently start a local bridge for the remote option.
+
 ## 1.1.0
 
 - Add `server-init` and `serve` for hosting the bridge alongside remote Ollama.

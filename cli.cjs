@@ -4,6 +4,7 @@ const path=require('node:path');
 const crypto=require('node:crypto');
 const net=require('node:net');
 const readline=require('node:readline/promises');
+const {Writable}=require('node:stream');
 const {spawn}=require('node:child_process');
 const core=require('./core.cjs');
 const ui=require('./ui.cjs');
@@ -72,10 +73,33 @@ async function setup(options){
     if(provider.toLowerCase()!=='ollama')throw new Error('Version 1 supports Ollama only.');
     ui.step(2,'Where is your model server?');
     console.log('  1  This computer     Ollama runs on this device');
-    console.log('  2  Local network     Ollama runs on another device');
+    console.log('  2  Remote / LAN      Use the bridge hosted on your Ollama server');
     let location=options.location || await ask('  Select location','1');
     location=({'1':'local','2':'lan'}[location] || location).toLowerCase();
     if(!['local','lan'].includes(location))throw new Error('Location must be local or lan.');
+    if(location==='lan'){
+      ui.step(3,'Remote bridge connection');
+      ui.hint('The bridge must be running on the remote server behind HTTPS.');
+      ui.hint('Use its HTTPS address, not the Ollama HTTP API port.');
+      const gatewayUrl=remote.remoteUrl(options.url || await ask('  Remote bridge URL (https://bridge.example.com)'));
+      ui.step(4,'Authenticate');
+      let credential=process.env.CLAUDEBL_REMOTE_TOKEN;
+      if(!credential){
+        if(!process.stdin.isTTY)throw new Error('Set CLAUDEBL_REMOTE_TOKEN to the remote bridge credential.');
+        rl?.close();rl=undefined;
+        process.stdout.write('  Remote bridge credential (hidden): ');
+        const hidden=new Writable({write(chunk,encoding,callback){callback();}});
+        hidden.isTTY=true;hidden.columns=process.stdout.columns || 80;
+        const secretInput=readline.createInterface({input:process.stdin,output:hidden,terminal:true});
+        try{credential=await secretInput.question('');}finally{secretInput.close();process.stdout.write('\n');}
+      }
+      ui.step(5,'Review and connect');
+      ui.summary([['Bridge location','Remote server'],['Desktop endpoint',gatewayUrl],['Local proxy','Not started']]);
+      if(!options.yes && !/^y(es)?$/i.test(await ask('  Save remote Desktop routing? y/n','n'))){console.log('Cancelled. No configuration changed.');return;}
+      await remote.connect({url:gatewayUrl,credential});
+      if(options.test)await doctor();
+      return;
+    }
     const input=options.url || (location==='local'?'http://127.0.0.1:11434':await ask('Ollama LAN server URL (example http://ollama-server.local:11434)'));
     const url=core.normalizeUrl(input);
     if(location==='local' && !['127.0.0.1','localhost','[::1]'].includes(new URL(url).hostname))throw new Error('Choose LAN for a remote server address.');
@@ -113,7 +137,7 @@ async function main(){
   if(Number(process.versions.node.split('.')[0])<20)throw new Error('Node.js 20 or newer is required.');
   const {command,options}=args(process.argv.slice(2));
   if(options.version || command==='version'){console.log('ClaudeCodeBridgeToLocal '+require('./package.json').version);return;}
-  if(options.help || command==='help'){console.log('Commands: setup, start, open, stop, status, doctor, restore, version, server-init, serve, connect\nRemote: server-init --url OLLAMA-URL --model MODEL; serve --config FILE; connect --url HTTPS-BRIDGE\nOpen: claudebl open [--app PATH]\nSetup flags: --provider ollama --location local|lan --url URL --model MODEL --port PORT --yes --test\nExample: claudebl setup --provider ollama --location lan --url http://ollama-server.local:11434 --model "YOUR-MODEL" --yes');return;}
+  if(options.help || command==='help'){console.log('Commands: setup, start, open, stop, status, doctor, restore, version, server-init, serve, connect\nRemote: server-init --url OLLAMA-URL --model MODEL; serve --config FILE; connect --url HTTPS-BRIDGE\nOpen: claudebl open [--app PATH]\nSetup flags: --provider ollama --location local|lan --url URL --model MODEL --port PORT --yes --test\nExample: claudebl setup --provider ollama --location lan --url https://bridge.example.com --yes');return;}
   switch(command){
     case 'server-init':await remote.serverInit(options);break;
     case 'serve':remote.serve(options);break;

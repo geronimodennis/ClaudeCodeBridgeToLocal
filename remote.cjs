@@ -33,7 +33,7 @@ async function connect(options){
   const p=core.paths();const stateFile=path.join(p.install,'state.json');
   if(fs.existsSync(stateFile) && core.readJson(stateFile).active)throw new Error('Restore the existing Desktop bridge configuration before connecting a remote bridge.');
   core.checkManaged();
-  const gatewayUrl=remoteUrl(options.url || '');const token=process.env.CLAUDEBL_REMOTE_TOKEN;
+  const gatewayUrl=remoteUrl(options.url || '');const token=options.credential || process.env.CLAUDEBL_REMOTE_TOKEN;
   if(!token || token.length<32)throw new Error('Set CLAUDEBL_REMOTE_TOKEN to the credential from your remote server configuration.');
   const headers={authorization:'Bearer '+token};const h=await json(gatewayUrl+'/health',{headers});
   if(h.service!=='claude-desktop-ollama-proxy' || !h.model || !h.instance)throw new Error('Endpoint is not a compatible remote bridge.');

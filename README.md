@@ -50,6 +50,14 @@ This is an **experimental compatibility bridge**, not an official Claude Desktop
 
 ## Quick setup
 
+In version 1.1.1, **This computer** runs the bridge locally. **Remote / LAN**
+connects Desktop directly to a bridge already hosted on the remote server and
+starts no local proxy. The remote choice asks for its HTTPS URL and credential.
+An HTTP Ollama URL is not a remote bridge URL; provision the bridge using
+[remote server setup](REMOTE-SETUP.md) first. Earlier LAN examples using an HTTP
+Ollama URL describe the old local-bridge-to-LAN behavior and no longer apply to
+`setup --location lan`.
+
 Extract the ZIP into a folder you can keep. Install Node.js from [nodejs.org](https://nodejs.org/) if needed, then open a new terminal. Do not run the wizard as Administrator or with `sudo`.
 
 | Platform | Start the wizard |
@@ -65,7 +73,7 @@ The wizard asks:
 
 1. **Provider:** Ollama. Version 1 supports Ollama only, not arbitrary OpenAI-compatible providers.
 2. **Location:** this computer or remote LAN.
-3. **Address:** local defaults to `http://127.0.0.1:11434`; LAN asks for a URL such as `http://ollama-server.local:11434`. The wizard accepts a `/v1` suffix and normalizes it to the Ollama server root.
+3. **Address:** local defaults to `http://127.0.0.1:11434`; LAN asks for the hosted bridge HTTPS URL, such as `https://bridge.example.com`.
 4. **Model:** it checks `/api/tags` and lists the server's available models. Enter a number or exact model name. Choose a tool-capable model for Code or Cowork. Cloud-backed Ollama models are identified when the server reports them.
 5. **Proxy port:** defaults to `11435`; choose another if occupied.
 6. **Review and apply:** the wizard shows the addresses and paths, asks before saving, backs up the previous Desktop selection, and starts the proxy.
@@ -78,7 +86,7 @@ Fully quit Claude Desktop and reopen it after setup. If it offers a configured t
 For a LAN server (replace the address and model with your own):
 
 ```sh
-claudebl setup --provider ollama --location lan --url http://ollama-server.local:11434 --model "YOUR-MODEL" --yes
+claudebl setup --provider ollama --location lan --url https://bridge.example.com --yes
 ```
 
 For a local server, replace the URL and model with your own:
