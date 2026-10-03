@@ -91,6 +91,17 @@ claudebl setup --provider ollama --location local --url http://127.0.0.1:11434 -
 
 ## Everyday commands
 
+Use `claudebl open` to launch Claude Desktop. From this source folder on Windows,
+run `.\run.cmd open`. The command discovers Windows Store installations, uses
+`open -a Claude` on macOS, and `claude-desktop` on Linux. For a custom executable:
+
+```powershell
+claudebl.cmd open --app "C:\path\claude-desktop.exe"
+```
+
+This opens the app; it does not restart an already-running app or start the proxy.
+Run `claudebl start` first when the proxy is stopped.
+
 | Action | All platforms | Windows shortcut | macOS/Linux shortcut |
 | --- | --- | --- | --- |
 | Start in background | `claudebl start` | `.\run.cmd start` | `sh run.sh start` |

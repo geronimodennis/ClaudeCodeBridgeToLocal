@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2
+
+- Add `claudebl open` to launch Claude Desktop on Windows, macOS, and Linux.
+- Discover Windows Store installations and common Desktop executable paths.
+- Support `claudebl open --app PATH` for custom installations.
+
 ## 1.0.1
 
 - Present setup as five numbered steps with a branded header, clearer location choices, and a review summary.

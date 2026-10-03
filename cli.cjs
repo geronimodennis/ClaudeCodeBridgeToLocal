@@ -7,6 +7,7 @@ const readline=require('node:readline/promises');
 const {spawn}=require('node:child_process');
 const core=require('./core.cjs');
 const ui=require('./ui.cjs');
+const {openDesktop}=require('./desktop.cjs');
 const p=core.paths();
 const settingsFile=path.join(p.install,'settings.json');
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
@@ -45,7 +46,7 @@ async function doctor(){
 }
 function args(argv){
   const options={};let command=argv[0] && !argv[0].startsWith('--') ? argv.shift() : 'setup';
-  const known=new Set(['provider','location','url','model','port']);
+  const known=new Set(['provider','location','url','model','port','app']);
   while(argv.length){const arg=argv.shift();if(['--yes','--test','--help','--version'].includes(arg)){options[arg.slice(2)]=true;continue;}if(!arg.startsWith('--') || !known.has(arg.slice(2)) || !argv.length)throw new Error('Unknown or incomplete option: '+arg);options[arg.slice(2)]=argv.shift();}
   return {command,options};
 }
@@ -108,10 +109,11 @@ async function main(){
   if(Number(process.versions.node.split('.')[0])<20)throw new Error('Node.js 20 or newer is required.');
   const {command,options}=args(process.argv.slice(2));
   if(options.version){console.log('ClaudeCodeBridgeToLocal '+require('./package.json').version);return;}
-  if(options.help || command==='help'){console.log('Commands: setup, start, stop, status, doctor, restore\nSetup flags: --provider ollama --location local|lan --url URL --model MODEL --port PORT --yes --test\nExample: claudebl setup --provider ollama --location lan --url http://ollama-server.local:11434 --model "YOUR-MODEL" --yes');return;}
+  if(options.help || command==='help'){console.log('Commands: setup, start, open, stop, status, doctor, restore\nOpen: claudebl open [--app PATH]\nSetup flags: --provider ollama --location local|lan --url URL --model MODEL --port PORT --yes --test\nExample: claudebl setup --provider ollama --location lan --url http://ollama-server.local:11434 --model "YOUR-MODEL" --yes');return;}
   switch(command){
     case 'setup':await setup(options);break;
     case 'start':await start();break;
+    case 'open':await openDesktop({app:options.app});break;
     case 'stop':await stop();break;
     case 'doctor':await doctor();break;
     case 'status':{
