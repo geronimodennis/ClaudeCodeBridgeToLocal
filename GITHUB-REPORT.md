@@ -46,3 +46,11 @@ open-source license separately.
 Published and verified: `claudecodebridgetolocal@1.0.0`, executable `claudebl`.
 The registry tarball SHA-1 is `20c7c53e598799219ef891f0e2ff3316473e59c7`, matching
 the release package built and tested locally. The local install smoke test passed.
+
+## GitHub Packages publication
+
+Published and verified: `@geronimodennis/claudecodebridgetolocal@1.0.0`.
+The package is public and associated with `geronimodennis/ClaudeCodeBridgeToLocal`.
+The publishing workflow and its Linux tests passed. The repository's original
+cross-platform CI matrix also completed successfully on Windows, macOS, and Linux.
+These automated tests do not establish full Claude Desktop inference compatibility.

@@ -30,6 +30,22 @@ npx --package claudecodebridgetolocal claudebl setup
 
 With a global install, all `claudebl` commands work from any directory. In a source checkout without an npm install, use `node cli.cjs COMMAND` or the platform launchers below. npm installation creates the CLI command but does not configure Desktop or start the proxy; `setup` does that.
 
+## Install from GitHub Packages
+
+Version **1.0.0** is also published as [`@geronimodennis/claudecodebridgetolocal`](https://github.com/users/geronimodennis/packages/npm/package/claudecodebridgetolocal) on GitHub's npm registry. Its executable is still `claudebl`.
+
+GitHub's npm registry requires authentication even for public packages. Sign in using your GitHub username and a personal access token (classic) with `read:packages` as the password; do not use your GitHub account password:
+
+```sh
+npm login --scope=@geronimodennis --auth-type=legacy --registry=https://npm.pkg.github.com
+npm install -g @geronimodennis/claudecodebridgetolocal --registry=https://npm.pkg.github.com
+claudebl setup
+```
+
+The unscoped npmjs.org package above remains available for installation without GitHub registry authentication. See [GitHub's npm registry documentation](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry).
+
+Maintainers can dispatch the **Publish to GitHub Packages** workflow. It tests the source, adds the GitHub scope and repository metadata in the runner, and publishes with the temporary `GITHUB_TOKEN`. It does not change the unscoped npmjs.org package metadata in the source checkout.
+
 This is an **experimental compatibility bridge**, not an official Claude Desktop integration for non-Claude models. It presents a Claude-shaped route ID to Desktop, translates it to the actual Ollama model, and labels the picker with the actual model name. The model is still Qwen, Gemma, or whichever Ollama model you select. Some Chat, Code, and Cowork features may not work because Ollama implements only part of the Anthropic API.
 
 ## Quick setup
