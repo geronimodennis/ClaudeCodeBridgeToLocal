@@ -1,0 +1,27 @@
+name: Publish to GitHub Packages
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  packages: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://npm.pkg.github.com
+          scope: '@geronimodennis'
+      - run: npm test
+      - name: Set GitHub registry package metadata
+        run: |
+          npm pkg set name='@geronimodennis/claudecodebridgetolocal'
+          npm pkg set publishConfig.registry='https://npm.pkg.github.com'
+          npm pkg set repository.type='git'
+          npm pkg set repository.url='https://github.com/geronimodennis/ClaudeCodeBridgeToLocal.git'
+      - name: Publish scoped package
+        run: npm publish --registry https://npm.pkg.github.com
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
