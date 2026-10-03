@@ -1,0 +1,10 @@
+node_modules/
+*.tgz
+*.zip
+*.log
+.npmrc
+settings.json
+state.json
+backups/
+.DS_Store
+Thumbs.db
