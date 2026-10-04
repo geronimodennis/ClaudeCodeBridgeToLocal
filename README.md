@@ -1,17 +1,17 @@
-# ClaudeCodeBridgeToLocal — v1.1.3
+# ClaudeCodeBridgeToLocal — v1.2.0
 
 A terminal setup wizard for Claude **Desktop**, with Windows, macOS, and Linux launchers. It supports Ollama on the same computer or on a remote LAN server. No npm libraries, Python, administrator access, or Claude Code CLI are required. Node.js **20 or newer** and an installed Claude Desktop app are required.
 
 Project name: **ClaudeCodeBridgeToLocal**. npm package: **`claudecodebridgetolocal`**. CLI command: **`claudebl`**. Despite the project name, this package configures the Claude Desktop GUI; it does not launch the Claude Code terminal CLI.
 
-Current release: **1.1.3**. Packages are available on [npm](https://www.npmjs.com/package/claudecodebridgetolocal). Source and release assets are hosted at [geronimodennis/ClaudeCodeBridgeToLocal](https://github.com/geronimodennis/ClaudeCodeBridgeToLocal).
+Release version: **1.2.0**. Packages are available on [npm](https://www.npmjs.com/package/claudecodebridgetolocal). Source and release assets are hosted at [geronimodennis/ClaudeCodeBridgeToLocal](https://github.com/geronimodennis/ClaudeCodeBridgeToLocal).
 
 ## Install the npm package
 
 To install a downloaded release tarball:
 
 ```sh
-npm install -g ./claudecodebridgetolocal-1.1.3.tgz
+npm install -g ./claudecodebridgetolocal-1.2.0.tgz
 claudebl setup
 ```
 
@@ -50,13 +50,7 @@ This is an **experimental compatibility bridge**, not an official Claude Desktop
 
 ## Quick setup
 
-In version 1.1.3, **This computer** runs the bridge locally. **Remote / LAN**
-connects Desktop directly to a bridge already hosted on the remote server and
-starts no local proxy. The remote choice asks for its HTTPS URL and credential.
-An HTTP Ollama URL is not a remote bridge URL; provision the bridge using
-[remote server setup](REMOTE-SETUP.md) first. Earlier LAN examples using an HTTP
-Ollama URL describe the old local-bridge-to-LAN behavior and no longer apply to
-`setup --location lan`.
+**This computer** uses a local Ollama server. **Remote / LAN** asks for the Ollama server address and accepts HTTP or HTTPS, such as `http://ollama-server.local:11434`. Both choices run the bridge on this computer; Desktop connects to its loopback URL. For an already hosted HTTPS bridge, use `claudebl connect --url https://bridge.example.com` instead.
 
 Extract the ZIP into a folder you can keep. Install Node.js from [nodejs.org](https://nodejs.org/) if needed, then open a new terminal. Do not run the wizard as Administrator or with `sudo`.
 
@@ -73,11 +67,11 @@ The wizard asks:
 
 1. **Provider:** Ollama. Version 1 supports Ollama only, not arbitrary OpenAI-compatible providers.
 2. **Location:** this computer or remote LAN.
-3. **Address:** local defaults to `http://127.0.0.1:11434`; LAN asks for the hosted bridge HTTPS URL, such as `https://bridge.example.com`.
+3. **Address:** local defaults to `http://127.0.0.1:11434`; LAN asks for the Ollama URL, such as `http://ollama-server.local:11434`.
 4. **Model:** it checks `/api/tags` and lists the server's available models. Enter a number or exact model name. Choose a tool-capable model for Code or Cowork. Cloud-backed Ollama models are identified when the server reports them.
 5. **Proxy port:** defaults to `11435`; choose another if occupied.
 6. **Review and apply:** the wizard shows the addresses and paths, asks before saving, backs up the previous Desktop selection, and starts the proxy.
-7. **Optional test:** send a short prompt with a 30-second limit. A test failure leaves the setup installed and reports inference as unverified.
+7. **Optional test:** send a short prompt with a 120-second limit. A test failure leaves the setup installed and reports inference as unverified.
 
 Fully quit Claude Desktop and reopen it after setup. If it offers a configured third-party connection, select that connection. Choose **Ollama: YOUR-MODEL (proxy)** in the model picker, then try a short prompt. Desktop must support third-party inference configuration; older releases may need an update.
 
@@ -86,7 +80,7 @@ Fully quit Claude Desktop and reopen it after setup. If it offers a configured t
 For a LAN server (replace the address and model with your own):
 
 ```sh
-claudebl setup --provider ollama --location lan --url https://bridge.example.com --yes
+claudebl setup --provider ollama --location lan --url http://ollama-server.local:11434 --model "YOUR-MODEL" --yes
 ```
 
 For a local server, replace the URL and model with your own:
@@ -154,7 +148,7 @@ To change provider address, model, or port: fully quit Desktop, run `restore`, t
 | macOS | `~/Library/Application Support/Claude-3p/configLibrary/` | `~/Library/Application Support/ClaudeDesktopOllamaProxy/` |
 | Linux | `~/.config/Claude-3p/configLibrary/` | `~/.config/ClaudeDesktopOllamaProxy/` |
 
-Linux honors `XDG_CONFIG_HOME` when set. The proxy installation contains `settings.json`, `state.json`, `server.cjs`, `core.cjs`, `proxy.log`, and `backups/<configuration-id>/`. Logs include times, request routes, status codes, and tool counts; they exclude prompt text and credentials.
+Linux honors `XDG_CONFIG_HOME` when set. The proxy installation contains `settings.json`, `state.json`, `server.cjs`, `core.cjs`, `compat.cjs`, `proxy.log`, and `backups/<configuration-id>/`. Logs include times, request routes, status codes, and tool counts; they exclude prompt text and credentials.
 
 Setup writes one new `<id>.json` Desktop configuration and updates `_meta.json` to select it. Existing configurations are preserved. If metadata existed, the exact original bytes are backed up before any Desktop edit. If it did not exist, recovery records its absence. Restore verifies that the metadata has not changed since setup; if it has, it refuses to overwrite later changes. In that case use **Developer → Configure Third-Party Inference** to select the prior configuration, or inspect the saved metadata backup and merge it manually. Do not blindly overwrite later configurations.
 
@@ -171,20 +165,26 @@ Claude Desktop
 
 The proxy binds to loopback only. Setup generates a separate random local credential and saves it in Desktop's proxy configuration. It forwards the fixed `ollama` placeholder upstream, never your Anthropic account token. Desktop sends the internal route ID `claude-sonnet-4-6`; the proxy replaces it with your exact Ollama model name. The picker explicitly identifies the actual Ollama model.
 
-Messages, tools, thinking, and streaming content are forwarded without silently stripping them. Model IDs in returned message envelopes are mapped back to the route ID. `/v1/models` advertises the selected model; `/v1/messages/count_tokens` is passed upstream and may return unsupported if Ollama does not implement it. Other endpoints return an explicit error. This is an inference bridge, not a general web proxy. HTTP LAN traffic follows the URL you enter; use an HTTPS Ollama endpoint if your network requires encryption.
+The bridge preserves text, base64 images, function tool calls/results, thinking blocks, sampling fields, stop sequences, and UTF-8 streaming through Ollama's Anthropic-compatible API. Model IDs are mapped in JSON and streaming envelopes. Missing cache counters default to zero. Cache directives are removed with a log notice. Adaptive thinking maps to enabled with a notice because semantics differ.
+
+Hosted tools, deferred discovery, documents, URL images, priority service tiers, context management, containers, remote MCP declarations, and structured output schemas receive explicit errors. Token counting is passed upstream; an unavailable endpoint returns Ollama’s original error instead of estimates. Claude behavior, thinking signatures, prompt caching, and every Desktop feature cannot be reproduced. No numerical compatibility percentage is claimed.
+
+Streaming requests send a ping every ten seconds while waiting. There is no bridge inference deadline by default. Set upstreamTimeoutMs to 0 for unlimited waiting, or a positive number to opt into a deadline; pingIntervalMs controls keepalive timing in milliseconds. Ollama HTTP error status and body pass through unchanged before streaming headers are sent; errors arriving after a keepalive are delivered as SSE error events because HTTP status can no longer change. Disconnected clients cancel upstream requests. Requests are never automatically replayed because retries can duplicate tool operations.
+
+After updating, run claudebl restart to back up and replace the installed runtime while preserving settings and credentials. To revert, stop the bridge, copy the files from the printed runtime backup to the installation directory, remove compat.cjs if the backup predates it, then run claudebl start. Hosted bridges must be updated on their server.
 
 ## Troubleshooting
 
 - **Port occupied:** stop the earlier proxy or choose `--port 11436`. This wizard does not kill unrelated processes.
 - **Cannot reach LAN server:** confirm Ollama listens on the LAN interface and the server firewall permits its port. Configure that on the server separately; this wizard does not change server settings.
-- **Model response timeout:** `doctor` waits 30 seconds; the proxy allows up to ten minutes of upstream inactivity. A busy server or a model loading a large context can be slow. Check Ollama logs and retry a simple prompt directly against `/v1/messages`.
+- **Model response timeout:** `doctor` waits 120 seconds; use `claudebl doctor --timeout 300` for slow models. The proxy waits for Ollama without its own inference deadline. Pings help idle disconnects but cannot override Desktop deadlines. A busy server or a model loading a large context can be slow. Check Ollama logs and retry a simple prompt directly against `/v1/messages`.
 - **Cloud-backed model:** prompts may go to Ollama's cloud service even when the Ollama endpoint is local or LAN. Choose an installed local model if that matters to you.
 - **Desktop ignores settings:** fully quit and reopen it; check whether managed configuration takes precedence. On Windows Store builds, also inspect the app's package-virtualized `LocalCache\Local\Claude-3p\configLibrary` if Desktop created a separate library there. This wizard uses the documented canonical path and does not overwrite a separate virtualized copy.
 - **A feature fails:** Ollama supports a subset of the Anthropic API. Successful model discovery does not prove Chat, Code, Cowork, hosted tools, or sandbox networking all work.
 
 ## Validation and current limitations
 
-`node --test test.cjs` runs isolated tests for all three platform path layouts, URL validation, backup/restore, authentication, model mapping, UTF-8 streaming, tool preservation, upstream errors, and detached process start/stop. The tests ran on Windows. macOS and Linux launchers and path handling are provided, but were not tested on native macOS/Linux hosts here. A real request to the LAN Qwen model in this chat previously timed out after three minutes; full Desktop inference remains unverified.
+`node --test test.cjs` runs isolated tests for all three platform path layouts, URL validation, backup/restore, authentication, model mapping, UTF-8 streaming, tool preservation, upstream errors, and detached process start/stop. The tests ran on Windows. macOS and Linux launchers and path handling are provided, but were not tested on native macOS/Linux hosts here. Mock tests verify protocol behavior, not complete Claude Desktop compatibility. A short live doctor request passed against the configured Ollama server. Large Desktop conversations can still take much longer; this release does not guarantee backend latency.
 
 No live Desktop configuration is changed merely by extracting this package. Run `setup` to apply it. This wizard does not automatically migrate earlier scripts from this chat.
 
@@ -208,4 +208,4 @@ npm publish --access public
 
 Publication is a separate step; building the tarball does not publish it. The repository workflow runs tests on Windows, macOS, and Linux with Node 20, 22, and 24; it does not publish automatically. This release retains all rights (`UNLICENSED`) until the owner chooses an open-source license.
 
-The redundant platform setup wrappers were removed in v1.1.3. Use run.cmd, run.sh, node cli.cjs, or npm run claudebl -- COMMAND instead.
+The redundant platform setup wrappers were removed in v1.1.2. Use run.cmd, run.sh, node cli.cjs, or npm run claudebl -- COMMAND instead.

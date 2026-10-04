@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.0
+
+- Wait indefinitely for Ollama by default; preserve upstream HTTP errors. Positive upstreamTimeoutMs remains an opt-in deadline.
+
+- Fix Remote / LAN setup to accept HTTP Ollama servers and route through the local bridge. Use connect explicitly for hosted HTTPS bridges.
+
+- Validate Anthropic requests, normalize response envelopes, and explicitly reject unsupported features.
+- Add streaming keepalive, completion deadlines, cancellation, and request diagnostics.
+- Increase doctor default to 120 seconds; support --timeout up to 600 seconds.
+- Add restart to upgrade runtime with backups and preserve credentials.
+
 ## 1.1.3
 
 - Present status with grouped addresses, colored bridge state, model details, and next steps.
