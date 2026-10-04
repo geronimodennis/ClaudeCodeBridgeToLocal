@@ -150,7 +150,10 @@ async function main(){
       if(!fs.existsSync(settingsFile)){console.log('Not installed by this wizard.');break;}
       const s=settings();const stateFile=path.join(p.install,'state.json');const active=fs.existsSync(stateFile) && core.readJson(stateFile).active;
       let running=false;try{running=(await health(s)).instance===s.instance;}catch{}
-      console.log(`Proxy: ${running?'running':'stopped'}\nDesktop wizard configuration: ${active?'applied':'restored'}\nProvider: ${s.url}\nModel: ${s.model}\nAutomatic startup: off\nLogs: ${path.join(p.install,'proxy.log')}`);break;
+      const remoteHosted=s.mode==='remote';
+      const localBridge=remoteHosted ? 'Not used (bridge hosted on remote server)' : `http://127.0.0.1:${s.port}`;
+      const desktopEndpoint=s.gatewayUrl || localBridge;
+      console.log(`Proxy: ${running?'running':'stopped'}\nBridge location: ${remoteHosted?'Remote server':'This computer'}\nDesktop wizard configuration: ${active?'applied':'restored'}\nOllama server URL: ${s.url}\nLocal bridge URL: ${localBridge}\nDesktop gateway URL: ${desktopEndpoint}\nModel: ${s.model}\nAutomatic startup: ${remoteHosted?'Managed on remote server':'off'}\nLogs: ${remoteHosted?'On remote server':path.join(p.install,'proxy.log')}`);break;
     }
     case 'restore':await stop();console.log(core.restoreConfiguration(p)?'Previous Desktop configuration restored. Fully quit and reopen Desktop.':'No active wizard configuration to restore.');break;
     default:throw new Error('Unknown command. Run claudebl help.');

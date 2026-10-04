@@ -99,6 +99,10 @@ claudebl setup --provider ollama --location local --url http://127.0.0.1:11434 -
 
 ## Everyday commands
 
+`claudebl status` shows the Ollama server URL, local bridge URL, and Desktop
+gateway URL separately. A hosted remote bridge reports the local bridge as
+unused and shows the remote HTTPS gateway instead.
+
 For a bridge hosted on the Ollama server instead of this computer, see
 [remote bridge setup](REMOTE-SETUP.md). The current release includes `server-init`,
 `serve`, and `connect`; these require an HTTPS bridge endpoint on your server.
