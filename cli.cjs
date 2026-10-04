@@ -102,7 +102,6 @@ async function setup(options){
     }
     const input=options.url || (location==='local'?'http://127.0.0.1:11434':await ask('Ollama LAN server URL (example http://ollama-server.local:11434)'));
     const url=core.normalizeUrl(input);
-    if(location==='local' && !['127.0.0.1','localhost','[::1]'].includes(new URL(url).hostname))throw new Error('Choose LAN for a remote server address.');
     ui.step(3,'Select a model');
     ui.hint('Connecting to '+ui.clean(url)+' ...');
     const tags=await request(url+'/api/tags');

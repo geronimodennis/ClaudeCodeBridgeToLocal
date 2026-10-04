@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.2
+
+- Update README version and bridge setup instructions.
+- Remove redundant setup wrappers; retain run.cmd, run.sh, npm scripts, and CLI.
+- Allow local bridge placement with an explicitly configured remote Ollama upstream.
+
 ## 1.1.1
 
 - Choose bridge placement from setup location: local runs a local bridge, LAN connects to a remote HTTPS bridge.

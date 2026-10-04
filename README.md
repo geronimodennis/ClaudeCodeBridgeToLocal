@@ -1,17 +1,17 @@
-# ClaudeCodeBridgeToLocal — v1.0.0
+# ClaudeCodeBridgeToLocal — v1.1.2
 
 A terminal setup wizard for Claude **Desktop**, with Windows, macOS, and Linux launchers. It supports Ollama on the same computer or on a remote LAN server. No npm libraries, Python, administrator access, or Claude Code CLI are required. Node.js **20 or newer** and an installed Claude Desktop app are required.
 
 Project name: **ClaudeCodeBridgeToLocal**. npm package: **`claudecodebridgetolocal`**. CLI command: **`claudebl`**. Despite the project name, this package configures the Claude Desktop GUI; it does not launch the Claude Code terminal CLI.
 
-Version **1.0.0** is published on [npm](https://www.npmjs.com/package/claudecodebridgetolocal). Source and release assets are hosted at [geronimodennis/ClaudeCodeBridgeToLocal](https://github.com/geronimodennis/ClaudeCodeBridgeToLocal).
+Current release: **1.1.2**. Packages are available on [npm](https://www.npmjs.com/package/claudecodebridgetolocal). Source and release assets are hosted at [geronimodennis/ClaudeCodeBridgeToLocal](https://github.com/geronimodennis/ClaudeCodeBridgeToLocal).
 
 ## Install the npm package
 
 To install a downloaded release tarball:
 
 ```sh
-npm install -g ./claudecodebridgetolocal-1.0.0.tgz
+npm install -g ./claudecodebridgetolocal-1.1.2.tgz
 claudebl setup
 ```
 
@@ -32,7 +32,7 @@ With a global install, all `claudebl` commands work from any directory. In a sou
 
 ## Install from GitHub Packages
 
-Version **1.0.0** is also published as [`@geronimodennis/claudecodebridgetolocal`](https://github.com/users/geronimodennis/packages/npm/package/claudecodebridgetolocal) on GitHub's npm registry. Its executable is still `claudebl`.
+The package is also available as [`@geronimodennis/claudecodebridgetolocal`](https://github.com/users/geronimodennis/packages/npm/package/claudecodebridgetolocal) on GitHub's npm registry. Its executable is still `claudebl`.
 
 GitHub's npm registry requires authentication even for public packages. Sign in using your GitHub username and a personal access token (classic) with `read:packages` as the password; do not use your GitHub account password:
 
@@ -50,7 +50,7 @@ This is an **experimental compatibility bridge**, not an official Claude Desktop
 
 ## Quick setup
 
-In version 1.1.1, **This computer** runs the bridge locally. **Remote / LAN**
+In version 1.1.2, **This computer** runs the bridge locally. **Remote / LAN**
 connects Desktop directly to a bridge already hosted on the remote server and
 starts no local proxy. The remote choice asks for its HTTPS URL and credential.
 An HTTP Ollama URL is not a remote bridge URL; provision the bridge using
@@ -62,9 +62,9 @@ Extract the ZIP into a folder you can keep. Install Node.js from [nodejs.org](ht
 
 | Platform | Start the wizard |
 | --- | --- |
-| Windows | Double-click `Setup-Windows.cmd`, or run `.\run.cmd setup` in PowerShell |
-| macOS | Run `sh run.sh setup` in Terminal; optionally run `chmod +x Setup-macOS.command` and double-click it |
-| Linux | Run `sh setup-linux.sh`, or `sh run.sh setup` |
+| Windows | Run `.\run.cmd setup` in PowerShell |
+| macOS | Run `sh run.sh setup` in Terminal |
+| Linux | Run `sh run.sh setup` |
 | All platforms, from source | Run `node cli.cjs setup` |
 
 Run commands from the extracted folder, or supply the full path to the launcher. Windows can also use Codex's bundled Node runtime when Node is absent from PATH. Other machines should install Node normally. The package does not include a runtime or silently install one.
@@ -100,7 +100,7 @@ claudebl setup --provider ollama --location local --url http://127.0.0.1:11434 -
 ## Everyday commands
 
 For a bridge hosted on the Ollama server instead of this computer, see
-[remote bridge setup](REMOTE-SETUP.md). Source version 1.1.0 adds `server-init`,
+[remote bridge setup](REMOTE-SETUP.md). The current release includes `server-init`,
 `serve`, and `connect`; these require an HTTPS bridge endpoint on your server.
 
 From the source folder, you can also use `npm run claudebl -- COMMAND`.
@@ -203,3 +203,5 @@ npm publish --access public
 ```
 
 Publication is a separate step; building the tarball does not publish it. The repository workflow runs tests on Windows, macOS, and Linux with Node 20, 22, and 24; it does not publish automatically. This release retains all rights (`UNLICENSED`) until the owner chooses an open-source license.
+
+The redundant platform setup wrappers were removed in v1.1.2. Use run.cmd, run.sh, node cli.cjs, or npm run claudebl -- COMMAND instead.
