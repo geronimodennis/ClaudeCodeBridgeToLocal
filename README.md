@@ -1,17 +1,17 @@
-# ClaudeCodeBridgeToLocal — v1.1.2
+# ClaudeCodeBridgeToLocal — v1.1.3
 
 A terminal setup wizard for Claude **Desktop**, with Windows, macOS, and Linux launchers. It supports Ollama on the same computer or on a remote LAN server. No npm libraries, Python, administrator access, or Claude Code CLI are required. Node.js **20 or newer** and an installed Claude Desktop app are required.
 
 Project name: **ClaudeCodeBridgeToLocal**. npm package: **`claudecodebridgetolocal`**. CLI command: **`claudebl`**. Despite the project name, this package configures the Claude Desktop GUI; it does not launch the Claude Code terminal CLI.
 
-Current release: **1.1.2**. Packages are available on [npm](https://www.npmjs.com/package/claudecodebridgetolocal). Source and release assets are hosted at [geronimodennis/ClaudeCodeBridgeToLocal](https://github.com/geronimodennis/ClaudeCodeBridgeToLocal).
+Current release: **1.1.3**. Packages are available on [npm](https://www.npmjs.com/package/claudecodebridgetolocal). Source and release assets are hosted at [geronimodennis/ClaudeCodeBridgeToLocal](https://github.com/geronimodennis/ClaudeCodeBridgeToLocal).
 
 ## Install the npm package
 
 To install a downloaded release tarball:
 
 ```sh
-npm install -g ./claudecodebridgetolocal-1.1.2.tgz
+npm install -g ./claudecodebridgetolocal-1.1.3.tgz
 claudebl setup
 ```
 
@@ -50,7 +50,7 @@ This is an **experimental compatibility bridge**, not an official Claude Desktop
 
 ## Quick setup
 
-In version 1.1.2, **This computer** runs the bridge locally. **Remote / LAN**
+In version 1.1.3, **This computer** runs the bridge locally. **Remote / LAN**
 connects Desktop directly to a bridge already hosted on the remote server and
 starts no local proxy. The remote choice asks for its HTTPS URL and credential.
 An HTTP Ollama URL is not a remote bridge URL; provision the bridge using
@@ -208,4 +208,4 @@ npm publish --access public
 
 Publication is a separate step; building the tarball does not publish it. The repository workflow runs tests on Windows, macOS, and Linux with Node 20, 22, and 24; it does not publish automatically. This release retains all rights (`UNLICENSED`) until the owner chooses an open-source license.
 
-The redundant platform setup wrappers were removed in v1.1.2. Use run.cmd, run.sh, node cli.cjs, or npm run claudebl -- COMMAND instead.
+The redundant platform setup wrappers were removed in v1.1.3. Use run.cmd, run.sh, node cli.cjs, or npm run claudebl -- COMMAND instead.
