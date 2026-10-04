@@ -100,7 +100,7 @@ test('CLI starts and stops detached installed proxy and restores isolated Deskto
     core.writeJson(path.join(p.install,'settings.json'),s);core.applyConfiguration(p,s);
     assert.match((await run('start')).stdout,/Proxy started/);
     assert.match((await run('start')).stdout,/already running/);
-    assert.match((await run('status')).stdout,/Proxy: running/);
+    assert.match((await run('status')).stdout,/Bridge reachable/);
     assert.match((await run('stop')).stdout,/Proxy stopped/);
     assert.match((await run('restore')).stdout,/configuration restored/);
     assert.equal(fs.existsSync(path.join(p.library,'_meta.json')),false);
